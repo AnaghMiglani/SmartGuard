@@ -1,0 +1,1 @@
+docker run -it ilf > smartguard.log <br> python extract_bugs.py
