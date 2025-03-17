@@ -81,4 +81,10 @@ RUN python3 setup.py install
 
 WORKDIR /go/src/ilf
 
-ENTRYPOINT [ "/bin/bash" ]
+# Ensure PYTHONPATH is set
+ENV PYTHONPATH=/go/src/ilf
+# Set LD_LIBRARY_PATH so that ./execution.so can be found at runtime
+ENV LD_LIBRARY_PATH=/go/src/ilf
+
+# Update ENTRYPOINT to write logs to the mounted host directory
+ENTRYPOINT [ "/bin/sh", "-c", "mkdir -p /go/src/ilf/log && python3 -m ilf --proj ./example/crowdsale/ --contract Crowdsale --fuzzer imitation --model ./model/ --limit 2000 | tee /go/src/ilf/log/smartguard.log" ]
