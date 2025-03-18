@@ -19,7 +19,7 @@ Smart Guard (Imitation Learning Fuzzer) is a tool designed to find vulnerabiliti
 *   **Configurable:** Supports setting the contract address, ABI path, RPC URL, and private key via command-line arguments.
 *   **No Local EVM:** Does *not* use a local EVM or patched Geth. All interactions are with a live testnet.
 
-## Features (Original Smart Guard - *Currently Disabled*)
+## Features
 
 *   **Imitation Learning:**  The original Smart Guard trained a neural network to mimic the transaction generation of a symbolic execution engine.  *This is not currently used in this version.*
 *   **Symbolic Execution:** The original Smart Guard used symbolic execution to generate high-quality training data. *This is not currently used in this version.*
