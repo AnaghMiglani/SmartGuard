@@ -6,7 +6,7 @@ ILF: AI-based Fuzzer for Ethereum Smart Contracts <a href="https://www.sri.inf.e
 
 ILF is an <ins>**I**</ins>mitation <ins>**L**</ins>earning based <ins>**F**</ins>uzzer for smart contracts. The fuzzing policy, which is used to generate transactions, is represented by an ensemble of neural networks and is learned from thousands of high-quality sequences of transactions generated using symbolic execution. ILF can be used to fuzz any Ethereum smart contract and outputs the coverage and a vulnerability report.
 
-ILF is developed at [SRI Lab, Department of Computer Science, ETH Zurich](https://www.sri.inf.ethz.ch/) as part of the [Machine Learning for Programming](https://www.sri.inf.ethz.ch/research/plml) and [Blockchain Security](https://www.sri.inf.ethz.ch/research/blockchain-security) projects. For mode details, please refer to [ILF CCS'19 paper](https://files.sri.inf.ethz.ch/website/papers/ccs19-ilf.pdf) and [slides](https://files.sri.inf.ethz.ch/website/slides/ccs19-ilf-slides.pdf).
+ILF is developed at [SRI Lab, Department of Computer Science, ETH Zurich](https://www.sri.inf.ethz.ch/) as part of the [Machine Learning for Programming](https://www.sri.inf.ethz.ch/research/plml) and [Blockchain Security](https://www.sri.inf.ethz.ch/research/blockchain-security) projects. For more details, please refer to [ILF CCS'19 paper](https://files.sri.inf.ethz.ch/website/papers/ccs19-ilf.pdf) and [slides](https://files.sri.inf.ethz.ch/website/slides/ccs19-ilf-slides.pdf).
 
 ## Setup
 
@@ -28,16 +28,16 @@ $ python3 -m ilf --proj ./example/crowdsale/ --contract Crowdsale --fuzzer imita
 ```
 The `--fuzzer` argument can be replaced by:
 * `random`: a uniformly random fuzzing policy.
-* `symbolic`: a symbolic execution fuzzing policy based on depth first search of block states. This is used for generating training sequences.
+* `symbolic`: a symbolic execution fuzzing policy based on depth-first search of block states. This is used for generating training sequences.
 * `sym_plus`: an augmentation of `symbolic` which can revisit encountered block states.
 * `mix`: a fuzzing policy that randomly chooses `imitation` or `symbolic` for generating each transaction.
 
-For fuzzing new contracts, one needs to provide a Truffle project (formatted as the example in `example/crowdsale`). Then the script `script/extract.py` should be called to extract deployment transactions of the contracts. For the example contract, the script runs as follows:
+For fuzzing new contracts, one needs to provide a Truffle project (formatted as the example in `ilf/example/crowdsale`). Then the script `script/extract.py` should be called to extract deployment transactions of the contracts. For the example contract, the script runs as follows:
 ```
-$ rm example/crowdsale/transactions.json
-$ python3 script/extract.py --proj example/crowdsale/ --port 8545
+$ rm ilf/example/crowdsale/transactions.json
+$ python3 script/extract.py --proj ilf/example/crowdsale/ --port 8545
 ```
-Note that you need to kill existing `ganache-cli` processes listening the same port before calling this script.
+Note that you need to kill existing `ganache-cli` processes listening on the same port before calling this script.
 
 ### Training
 
@@ -61,7 +61,7 @@ $ python3 -m ilf --fuzzer imitation --train_dir ./train_data --model ./new_model
 
 ### Automatically Constructing Truffle Projects
 
-For evaluation and training purposes, one might want to automatically construct Truffle projects from a large set of contracts. To achieve this, one can write a script to automatically produce files required by Truffle projects, following the format in `example/crowdsale`. The compressed file `truffle_scripts.tar.gz` contains the scripts we used. Those scripts might not run directly but can give you a high level idea how things work.
+For evaluation and training purposes, one might want to automatically construct Truffle projects from a large set of contracts. To achieve this, one can write a script to automatically produce files required by Truffle projects, following the format in `example/crowdsale`. The backend now supports creating Truffle projects dynamically via the `/api/save-code` endpoint.
 
 ## Citing ILF
 ```

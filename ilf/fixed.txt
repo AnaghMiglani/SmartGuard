@@ -1,0 +1,15 @@
+[Issue Title]: Unprotected Owner Modification
+[Description]: The `setOwner` function allows anyone to change the owner of the contract. This is because the require statement `require(msg.sender == owner);` is commented out. This lack of authorization means any user can seize control of the contract, potentially leading to unauthorized withdrawals, phase changes or other malicious activities.
+[Recommendation]: Uncomment the `require(msg.sender == owner);` line in the `setOwner` function to ensure only the current owner can modify the owner address.
+
+[Issue Title]: Integer Overflow/Underflow Vulnerability
+[Description]: The `raised` variable, which accumulates the total funds raised, can potentially overflow. If the total `msg.value` sent through the `invest()` function exceeds the maximum value of `uint256`, the `raised` variable will wrap around to zero. This could bypass the `raised < goal` check in the `invest()` function's require statement, potentially enabling further investments even after the goal is reached. Also, it could lead to incorrect phase calculation.
+[Recommendation]: Use SafeMath or a similar library to prevent integer overflow/underflow vulnerabilities when performing arithmetic operations on the `raised` variable. Consider using a more robust approach to avoid overflow by checking if `raised + msg.value < raised` before adding `msg.value` to `raised`.
+
+[Issue Title]: Potential Denial of Service in `withdraw()` Function
+[Description]: The `withdraw()` function transfers the entire `raised` amount to the `owner` address using `owner.transfer(raised)`. If the `raised` amount is very large, the `transfer()` function might fail due to the gas limit imposed on transfer operations (2300 gas). This failure would prevent the owner from withdrawing funds, essentially freezing the contract. Additionally, if the owner is a contract that does not have a receive or fallback function that accepts Ether, the transfer will revert.
+[Recommendation]: Implement a withdrawal pattern where the owner can withdraw the funds in smaller chunks, avoiding the gas limit issue. Alternatively, use `call` with sufficient gas or a pull payment mechanism to mitigate the risks associated with the `transfer()` function and gas limits.
+
+[Issue Title]: Reentrancy Vulnerability in `refund()` Function
+[Description]: The `refund()` function uses `msg.sender.transfer(deposits[msg.sender]);` to refund the user. If `msg.sender` is a contract, this call can trigger a reentrancy vulnerability. The malicious contract can call `invest()` again before the `deposits[msg.sender] = 0;` line is executed, allowing the attacker to withdraw more funds than they initially deposited. This is a classic reentrancy attack.
+[Recommendation]: Implement a checks-effects-interactions pattern. Specifically, set `deposits[msg.sender] = 0;` before transferring the funds to the user using `transfer()`. Alternatively, use a pull payment mechanism to mitigate this vulnerability.

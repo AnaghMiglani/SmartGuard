@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
 const app = express();
 const port = 3000;
 
@@ -54,6 +56,68 @@ app.post('/analyze', (req, res) => {
         console.error("Error analyzing code:", error);
         res.status(500).json({ error: 'An error occurred during analysis.' });
     }
+});
+
+// Endpoint to save Solidity code and create Truffle project
+app.post('/api/save-code', (req, res) => {
+    const { solidityCode } = req.body;
+
+    if (!solidityCode) {
+        return res.status(400).json({ error: 'No Solidity code provided.' });
+    }
+
+    // Define the Truffle project structure under the ilf directory
+    const ilfDir = path.join(__dirname, '../ilf');
+    const exampleDir = path.join(ilfDir, 'example', 'crowdsale');
+    const contractsDir = path.join(exampleDir, 'contracts');
+    const migrationsDir = path.join(exampleDir, 'migrations');
+    const testDir = path.join(exampleDir, 'test');
+
+    // Create directories if they don't exist
+    [contractsDir, migrationsDir, testDir].forEach(dir => {
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+    });
+
+    // Save the Solidity code in the contracts directory
+    const solidityFilePath = path.join(contractsDir, 'Crowdsale.sol');
+    fs.writeFileSync(solidityFilePath, solidityCode);
+
+    // Create a basic Truffle configuration file
+    const truffleConfigPath = path.join(exampleDir, 'truffle-config.js');
+    if (!fs.existsSync(truffleConfigPath)) {
+        fs.writeFileSync(truffleConfigPath, `
+module.exports = {
+  networks: {
+    development: {
+      host: "127.0.0.1",
+      port: 8545,
+      network_id: "*" // Match any network id
+    }
+  },
+  compilers: {
+    solc: {
+      version: "0.8.0" // Specify the Solidity compiler version
+    }
+  }
+};
+`);
+    }
+
+    // Create a basic migration file
+    const migrationFilePath = path.join(migrationsDir, '1_initial_migration.js');
+    if (!fs.existsSync(migrationFilePath)) {
+        fs.writeFileSync(migrationFilePath, `
+const Crowdsale = artifacts.require("Crowdsale");
+
+module.exports = function (deployer) {
+  deployer.deploy(Crowdsale);
+};
+`);
+    }
+
+    res.json({ message: 'Truffle project created successfully' });
 });
 
 app.listen(port, () => {
