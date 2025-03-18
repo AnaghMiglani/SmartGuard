@@ -3,7 +3,7 @@
 [![SRI Lab, ETH Zurich](http://safeai.ethz.ch/img/sri-logo.svg)](https://www.sri.inf.ethz.ch/)
 
 <p align="center">
-    <img width="500" alt="Smart Guard Logo" src="https://www.sri.inf.ethz.ch/assets/images/Smart Guard-logo-1.png">
+    <img width="500" alt="Smart Guard Logo" src="./assets/Logo.webp">
 </p>
 
 **This is a heavily modified and simplified version of the original Smart Guard fuzzer, adapted for direct interaction with a live Ethereum testnet (Educhain, in this case) via Web3.py. The original symbolic execution and imitation learning components are currently disabled.**  This README reflects the *current state* of this modified version, not the original Smart Guard project as described in the CCS'19 paper.
