@@ -1,7 +1,5 @@
 # Smart Guard: AI-based Fuzzer for Ethereum Smart Contracts (Refactored for Testnet Deployment)
 
-[![SRI Lab, ETH Zurich](http://safeai.ethz.ch/img/sri-logo.svg)](https://www.sri.inf.ethz.ch/)
-
 <p align="center">
     <img width="500" alt="Smart Guard Logo" src="./assets/Logo.webp">
 </p>
