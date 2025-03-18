@@ -1,7 +1,7 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 RUN apt-get -y update
-RUN apt-get -y install \
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install \
     wget \
     python3 \
     python3-pip \
@@ -41,6 +41,7 @@ RUN make -j7
 RUN make install
 
 # copy ilf
+WORKDIR /go/src/ilf
 ADD ./ /go/src/ilf/
 
 # install go-ethereum
@@ -52,8 +53,8 @@ RUN git checkout 86be91b3e2dff5df28ee53c59df1ecfe9f97e007
 # Comment out the failing patch command:
 # RUN git apply /go/src/ilf/script/patch.geth
 
+
 # Append a dummy definition of ExpNewCanonical to fix the undefined error.
-# This adds the function at the end of the file core/chain_makers.go.
 RUN echo "" >> core/chain_makers.go && \
     echo "func ExpNewCanonical(engine consensus.Engine, n int, full bool) (ethdb.Database, *BlockChain, error) {" >> core/chain_makers.go && \
     echo "    return newCanonical(engine, n, full)" >> core/chain_makers.go && \
@@ -62,7 +63,9 @@ RUN echo "" >> core/chain_makers.go && \
 WORKDIR /go/src/ilf
 # install python dependencies
 RUN apt-get -y install autoconf libjpeg-dev zlib1g-dev
+RUN apt-get -y install pkg-config
 RUN pip3 install --upgrade pip setuptools wheel
+RUN pip3 install google-generativeai --no-cache-dir
 RUN pip3 install "cython<3.0.0" --no-cache-dir
 RUN pip3 install "pyyaml<6.0" --no-cache-dir
 RUN pip3 install cytoolz --no-cache-dir
@@ -75,16 +78,16 @@ WORKDIR /
 RUN git clone https://github.com/ethereum/pyethereum.git
 WORKDIR /pyethereum
 RUN git checkout v2.3.2
-# Fix PyYAML compatibility issue by pinning an older version
 RUN sed -i 's/pyyaml.*/pyyaml>=3.11,<6.0/' setup.py
 RUN python3 setup.py install
 
 WORKDIR /go/src/ilf
-
-# Ensure PYTHONPATH is set
 ENV PYTHONPATH=/go/src/ilf
-# Set LD_LIBRARY_PATH so that ./execution.so can be found at runtime
 ENV LD_LIBRARY_PATH=/go/src/ilf
 
-# Update ENTRYPOINT to write logs to the mounted host directory
-ENTRYPOINT [ "/bin/sh", "-c", "mkdir -p /go/src/ilf/log && python3 -m ilf --proj ./example/crowdsale/ --contract Crowdsale --fuzzer imitation --model ./model/ --limit 2000 | tee /go/src/ilf/log/smartguard.log" ]
+# Expose the working directory as a volume so that generated files (like fixed.sol) are accessible outside the container.
+VOLUME ["/go/src/ilf"]
+
+# Updated ENTRYPOINT: ensure log.txt is created, then run fix_contract.py,
+# and finally start the main process.
+ENTRYPOINT [ "/bin/sh", "-c", "touch log.txt && python3 fix_contract.py && mkdir -p /go/src/ilf/log && python3 -m ilf --proj ./example/crowdsale/ --contract Crowdsale --fuzzer imitation --model ./model/ --limit 2000 | tee /go/src/ilf/log/smartguard.log" ]
