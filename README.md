@@ -7,7 +7,8 @@
 **This is a heavily modified and simplified version of the original Smart Guard fuzzer, adapted for direct interaction with a live Ethereum testnet (Educhain, in this case) via Web3.py. The original symbolic execution and imitation learning components are currently disabled.**  This README reflects the *current state* of this modified version, not the original Smart Guard project as described in the CCS'19 paper.
 
 ## Overview
-
+[Demo Video](https://drive.google.com/file/d/1bAhxaTQzVBGD_ONA-RFutmCn65WGQVHc/view)
+<br>
 Smart Guard (Imitation Learning Fuzzer) is a tool designed to find vulnerabilities in Ethereum smart contracts. This refactored version uses a random fuzzing approach, generating transactions and sending them to a specified contract on a live testnet. It leverages the `web3.py` library for all blockchain interactions. While the original Smart Guard's core concept was to *learn* a fuzzing policy from symbolic execution traces, this functionality is *not* currently active in this version. This version is effectively a simplified, random fuzzer that works with a live testnet.
 
 ## Features (Current Version)
